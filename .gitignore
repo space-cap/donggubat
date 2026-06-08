@@ -1,0 +1,52 @@
+# Dependency directories
+node_modules/
+jspm_packages/
+web_modules/
+
+# IDEs and editors
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Operating System Files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Log files
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Temporary files and backup
+*.tmp
+*.temp
+*.bak
+*~
+
+# Local Env / Secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.env
+.env.local
+
+# Gemini / Agent artifacts & cache
+.gemini/
+.claud/
+
+# Obsidian - Exclude all obsidian folders
+**/.obsidian/
