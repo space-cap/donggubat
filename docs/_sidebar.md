@@ -1,3 +1,4 @@
+* [발표안 v8](donggubat_slide_v8.md)
 * [발표안 v7](donggubat_slide_v7.md)
 * [발표안 v4](donggubat_slide_v4.md)
 * [발표안 v3](donggubat_slide_v3.md)
