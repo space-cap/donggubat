@@ -7,3 +7,6 @@
   * [브랜드 전략 분석](donggubat_brand_strategy.md)
   * [제품별 페르소나](donggubat_product_persona.md)
   * [발표 Q&A 대비](donggubat_presentation_qna.md)
+  * [팀원 조사 자료 (Claude)](https://claude.ai/share/3260be66-bda0-4d0e-a9ae-cc8ce7675b70)
+  * [팀원 조사 자료 (Gemini)](https://gemini.google.com/share/3d4c63cec168)
+  * [팀원 조사 자료 (Google 슬라이드)](https://docs.google.com/presentation/d/1czwSM_aTfkNt1Hr9Bb687zpUp2bkMB3htkRVEHFuciA/edit?slide=id.p15#slide=id.p15)
