@@ -2,6 +2,7 @@
   * [A안 - 균형형 9장](donggubat_slide_v11.md)
   * [B안 - 독창적 관점 10장](donggubat_slide_v8.md)
   * [C안 - 논리 집중 9장](donggubat_slide_v7.md)
+  * [C안 v7-1 - 피드백 반영본](donggubat_slide_v7_1.md)
 
 ---
 
