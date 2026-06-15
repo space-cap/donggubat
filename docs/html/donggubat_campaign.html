@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>동구밭 캠페인 전략 분석 대시보드</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans KR', 'sans-serif'],
+                    },
+                    colors: {
+                        donggu: {
+                            green: '#2d6a4f',
+                            lightgreen: '#d8f3dc',
+                            forest: '#1b4332',
+                            blue: '#1e40af',
+                            lightblue: '#dbeafe',
+                            earth: '#7f5539',
+                            sand: '#ede0d4'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
+
+    <!-- Navigation Bar -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-donggu-green flex items-center justify-center text-white font-bold text-lg shadow-md shadow-emerald-900/20">
+                        밭
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-1.5">
+                            동구밭 캠페인 아카이브
+                            <span class="text-xs bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.5 rounded-full">전략 발표용</span>
+                        </h1>
+                        <p class="text-xs text-slate-500">기본 캠페인 분석 & 신규 마케팅 전략 연계 모델</p>
+                    </div>
+                </div>
+                <div class="hidden md:flex space-x-1" id="nav-tabs">
+                    <button onclick="switchTab('dashboard')" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg bg-emerald-50 text-emerald-700" id="tab-dashboard">
+                        <i class="fa-solid fa-chart-simple mr-1.5"></i>대시보드
+                    </button>
+                    <button onclick="switchTab('deepdive')" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-50" id="tab-deepdive">
+                        <i class="fa-solid fa-layer-group mr-1.5"></i>7대 캠페인 상세
+                    </button>
+                    <button onclick="switchTab('strategy')" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-50" id="tab-strategy">
+                        <i class="fa-solid fa-lightbulb mr-1.5"></i>전략 제안 브릿지
+                    </button>
+                    <button onclick="switchTab('pitch')" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-50" id="tab-pitch">
+                        <i class="fa-solid fa-display mr-1.5"></i>발표 슬라이드
+                    </button>
+                    <button onclick="switchTab('share')" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-50" id="tab-share">
+                        <i class="fa-solid fa-paper-plane mr-1.5"></i>팀원 공유 툴킷
+                    </button>
+                </div>
+                <!-- Mobile Menu Button Icon -->
+                <div class="md:hidden">
+                    <button onclick="toggleMobileMenu()" class="text-slate-500 hover:text-slate-700 p-2 rounded-lg hover:bg-slate-100">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Dropdown Navigation -->
+        <div id="mobile-menu" class="hidden md:hidden border-t border-slate-200 bg-white px-4 py-3 space-y-2 shadow-inner">
+            <button onclick="switchTab('dashboard')" class="w-full text-left px-4 py-2 text-sm font-medium rounded-lg bg-emerald-50 text-emerald-700 block" id="m-tab-dashboard">대시보드</button>
+            <button onclick="switchTab('deepdive')" class="w-full text-left px-4 py-2 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50 block" id="m-tab-deepdive">7대 캠페인 상세</button>
+            <button onclick="switchTab('strategy')" class="w-full text-left px-4 py-2 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50 block" id="m-tab-strategy">전략 제안 브릿지</button>
+            <button onclick="switchTab('pitch')" class="w-full text-left px-4 py-2 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50 block" id="m-tab-pitch">발표 슬라이드</button>
+            <button onclick="switchTab('share')" class="w-full text-left px-4 py-2 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50 block" id="m-tab-share">팀원 공유 툴킷</button>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- Banner / Intro Panel -->
+        <div class="mb-8 p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-donggu-forest via-donggu-green to-emerald-900 text-white shadow-xl relative overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 opacity-10 text-[180px] pointer-events-none">
+                <i class="fa-solid fa-seedling"></i>
+            </div>
+            <div class="relative z-10 max-w-3xl">
+                <span class="bg-white/20 text-emerald-200 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">Donggubat Mission Architecture</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold mt-3 tracking-tight">"발달장애인 근속연수 해결을 넘어 기후정의를 실천하다"</h2>
+                <p class="text-emerald-100/90 mt-2 text-sm sm:text-base leading-relaxed">
+                    동구밭의 브랜드 캠페인은 단순한 제품 홍보가 아닙니다. 
+                    <strong class="text-white">환경·기후정의</strong>와 <strong class="text-white">장애인 고용·인식 개선</strong>이라는 두 가지 핵심 가치를 
+                    진정성 있는 브랜드 행동과 상징물로 구축해 낸 국내 최고의 사회적 마케팅 레퍼런스입니다.
+                </p>
+                <div class="mt-4 flex flex-wrap gap-2 text-xs">
+                    <span class="bg-white/10 px-3 py-1.5 rounded-lg border border-white/10 flex items-center gap-1">
+                        <i class="fa-solid fa-droplet text-cyan-300"></i> 제로웨이스트 고체 비누
+                    </span>
+                    <span class="bg-white/10 px-3 py-1.5 rounded-lg border border-white/10 flex items-center gap-1">
+                        <i class="fa-solid fa-hands-holding-child text-amber-300"></i> 발달장애 사원 50% 이상 고용
+                    </span>
+                    <span class="bg-white/10 px-3 py-1.5 rounded-lg border border-white/10 flex items-center gap-1">
+                        <i class="fa-solid fa-earth-asia text-emerald-300"></i> 플라스틱 프리 솔루션
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB 1: DASHBOARD ==================== -->
+        <div id="panel-dashboard" class="tab-panel space-y-8">
+            <!-- Filter Bar and Stat Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center space-x-4">
+                    <div class="p-3 bg-emerald-50 rounded-xl text-emerald-600 text-xl">
+                        <i class="fa-solid fa-leaf"></i>
+                    </div>
+                    <div>
+                        <div class="text-xs text-slate-500 font-semibold uppercase">환경·기후정의</div>
+                        <div class="text-2xl font-bold text-slate-800">3개 캠페인</div>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center space-x-4">
+                    <div class="p-3 bg-blue-50 rounded-xl text-blue-600 text-xl">
+                        <i class="fa-solid fa-wheelchair"></i>
+                    </div>
+                    <div>
+                        <div class="text-xs text-slate-500 font-semibold uppercase">장애 인식 및 고용</div>
+                        <div class="text-2xl font-bold text-slate-800">4개 캠페인</div>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 bg-gradient-to-r from-emerald-50 to-blue-50 flex items-center space-x-4 border-2 border-dashed border-emerald-300/60">
+                    <div class="p-3 bg-white rounded-xl text-indigo-600 text-xl shadow-sm">
+                        <i class="fa-solid fa-bridge-circle-check"></i>
+                    </div>
+                    <div>
+                        <div class="text-xs text-slate-500 font-semibold uppercase">다음 발표 전략 제안</div>
+                        <div class="text-md font-bold text-slate-800 leading-tight">7일 고체생활 입문 캠페인</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Campaign Grid Matrix -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="px-6 py-5 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900">동구밭 캠페인 맵핑 매트릭스</h3>
+                        <p class="text-xs text-slate-500">각 캠페인의 슬로건, 구현 방식 및 마케팅 관점을 종합한 아키이브 테이블</p>
+                    </div>
+                    <div class="flex gap-1 bg-slate-100 p-1 rounded-lg text-xs font-semibold self-stretch sm:self-auto">
+                        <button onclick="filterMatrix('all')" id="filter-all" class="matrix-filter-btn px-3 py-1.5 rounded-md bg-white text-slate-800 shadow-sm">전체</button>
+                        <button onclick="filterMatrix('env')" id="filter-env" class="matrix-filter-btn px-3 py-1.5 rounded-md text-slate-600 hover:text-slate-900">환경</button>
+                        <button onclick="filterMatrix('dis')" id="filter-dis" class="matrix-filter-btn px-3 py-1.5 rounded-md text-slate-600 hover:text-slate-900">장애인식</button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto custom-scrollbar">
+                    <table class="w-full text-left text-sm border-collapse">
+                        <thead class="bg-slate-50 text-slate-500 text-xs font-semibold border-b border-slate-200">
+                            <tr>
+                                <th class="py-4 px-6">구분</th>
+                                <th class="py-4 px-6">캠페인명</th>
+                                <th class="py-4 px-6">핵심 메시지 (슬로건)</th>
+                                <th class="py-4 px-6">수행 방식 (How)</th>
+                                <th class="py-4 px-6">마케팅적 가치 / 시각</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            <!-- Campaign 1 -->
+                            <tr class="campaign-row env-row hover:bg-slate-50 transition-colors">
+                                <td class="py-4 px-6">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                                        <i class="fa-solid fa-leaf mr-1"></i> 환경
+                                    </span>
+                                </td>
+                                <td class="py-4 px-6 font-bold text-slate-900">한 달에 한 번, 플로깅 데이</td>
+                                <td class="py-4 px-6 text-slate-600 font-medium">작은 행동이 기후정의로 이어진다</td>
+                                <td class="py-4 px-6 text-slate-500 text-xs">매달 마지막 주 수요일 전 임직원 거리 쓰레기 줍기 및 재활용 분류 실천</td>
+                                <td class="py-4 px-6 text-slate-700 font-medium text-xs">말뿐이 아닌 직접 행동하는 진정성 제시</td>
+                            </tr>
+                            <!-- Campaign 2 -->
+                            <tr class="campaign-row env-row hover:bg-slate-50 transition-colors">
+                                <td class="py-4 px-6">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                                        <i class="fa-solid fa-leaf mr-1"></i> 환경
+                                    </span>
+                                </td>
+                                <td class="py-4 px-6 font-bold text-slate-900">일주일에 하루, #플라스틱없는날</td>
+                                <td class="py-4 px-6 text-slate-600 font-medium">완벽한 제로웨이스트보다 하루 실천</td>
+                                <td class="py-4 px-6 text-slate-500 text-xs">매주 월요일 플라스틱 배출을 줄이는 일상 속 챌린지 제안</td>
+                                <td class="py-4 px-6 text-slate-700 font-medium text-xs">쉬운 참여 구조로 실천 장벽 완화 (★)</td>
+                            </tr>
+                            <!-- Campaign 3 -->
+                            <tr class="campaign-row env-row hover:bg-slate-50 transition-colors">
+                                <td class="py-4 px-6">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                                        <i class="fa-solid fa-leaf mr-1"></i> 환경
+                                    </span>
+                                </td>
+                                <td class="py-4 px-6 font-bold text-slate-900">2022 환경의 날 - 검은 숲</td>
+                                <td class="py-4 px-6 text-slate-600 font-medium">산불 피해와 기후위기를 기억하자</td>
+                                <td class="py-4 px-6 text-slate-500 text-xs">산불 피해목을 인센스 홀더로 업사이클링 제작 및 수익금 산불 복구 기부</td>
+                                <td class="py-4 px-6 text-slate-700 font-medium text-xs">사회문제를 굿즈 생산 및 기부 모델로 환원</td>
+                            </tr>
+                            <!-- Campaign 4 -->
+                            <tr class="campaign-row dis-row hover:bg-slate-50 transition-colors">
+                                <td class="py-4 px-6">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        <i class="fa-solid fa-wheelchair mr-1"></i> 장애인식
+                                    </span>
+                                </td>
+                                <td class="py-4 px-6 font-bold text-slate-900">2022 블루로드 캠페인</td>
+                                <td class="py-4 px-6 text-slate-600 font-medium">불가능을 가능으로 이끌다 (파란 장미)</td>
+                                <td class="py-4 px-6 text-slate-500 text-xs">70여 명의 임직원과 팬덤이 시각적 파란 피켓을 들고 서울 도심 행진</td>
+                                <td class="py-4 px-6 text-slate-700 font-medium text-xs">사회적 미션을 직관적이고 강력한 시각화로 전달</td>
+                            </tr>
+                            <!-- Campaign 5 -->
+                            <tr class="campaign-row dis-row hover:bg-slate-50 transition-colors">
+                                <td class="py-4 px-6">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        <i class="fa-solid fa-wheelchair mr-1"></i> 장애인식
+                                    </span>
+                                </td>
+                                <td class="py-4 px-6 font-bold text-slate-900">2022 국제 장애인의 날 ‘장인’</td>
+                                <td class="py-4 px-6 text-slate-600 font-medium">편견보다 가능성을 보자</td>
+                                <td class="py-4 px-6 text-slate-500 text-xs">발달장애 사원 디자인 한정 에디션 비누 출시 (Disability → ability 소멸 각인)</td>
+                                <td class="py-4 px-6 text-slate-700 font-medium text-xs">제품 사용 경험 속에 메시지를 위트 있게 배치 (★)</td>
+                            </tr>
+                            <!-- Campaign 6 -->
+                            <tr class="campaign-row dis-row hover:bg-slate-50 transition-colors">
+                                <td class="py-4 px-6">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        <i class="fa-solid fa-wheelchair mr-1"></i> 장애인식
+                                    </span>
+                                </td>
+                                <td class="py-4 px-6 font-bold text-slate-900">2023 일상에서 만나다</td>
+                                <td class="py-4 px-6 text-slate-600 font-medium">장애인과 비장애인의 일상적 공존</td>
+                                <td class="py-4 px-6 text-slate-500 text-xs">거리 홍보를 통해 대한민국 장애 인구 비중 및 의무 고용률(3.4%) 준수 촉구</td>
+                                <td class="py-4 px-6 text-slate-700 font-medium text-xs">시혜적 관점을 배제하고 헌법적 권리와 일상을 화두로 던짐</td>
+                            </tr>
+                            <!-- Campaign 7 -->
+                            <tr class="campaign-row dis-row hover:bg-slate-50 transition-colors">
+                                <td class="py-4 px-6">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        <i class="fa-solid fa-wheelchair mr-1"></i> 장애인식
+                                    </span>
+                                </td>
+                                <td class="py-4 px-6 font-bold text-slate-900">2024 직업 재활의 날 캠페인</td>
+                                <td class="py-4 px-6 text-slate-600 font-medium">제 의지와 근성은 변함이 없어요</td>
+                                <td class="py-4 px-6 text-slate-500 text-xs">발달장애 사원(노승준 매니저)의 진솔한 성장 인터뷰 기획 및 스토리 전파</td>
+                                <td class="py-4 px-6 text-slate-700 font-medium text-xs">추상적인 가치를 인격화된 감동으로 치환</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Core Insight Banner -->
+            <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6 flex flex-col sm:flex-row items-start gap-4">
+                <div class="p-3 bg-amber-100 text-amber-800 rounded-xl text-xl self-start">
+                    <i class="fa-solid fa-lightbulb"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-amber-900">대시보드 핵심 분석 결과 (Team Insight)</h4>
+                    <p class="text-sm text-amber-800/90 mt-1 leading-relaxed">
+                        동구밭의 기존 캠페인은 대부분 <strong>'가치와 신념의 선포'</strong>에 머물렀습니다. 
+                        브랜드 파워와 신뢰는 매우 높으나, 브랜드 제품을 아직 한 번도 써보지 않은 주류 대중(친환경 고체 비누 입문자)이 
+                        <strong>첫 제품을 장바구니에 담기에는 행동 유도(Call-To-Action, CTA)가 부재</strong>했습니다. 
+                        따라서 이번 과제에서는 동구밭의 훌륭한 브랜드 자산을 기반으로, 대중의 실천을 아주 구체적이고 재미있게 유도하는 <strong>체험지향적 퍼널 마케팅</strong>이 강력히 필요합니다.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB 2: DEEP DIVE ==================== -->
+        <div id="panel-deepdive" class="tab-panel hidden space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h3 class="text-xl font-bold text-slate-900">동구밭 7대 캠페인 상세 분석 레포트</h3>
+                    <p class="text-xs text-slate-500">기존에 실행되었던 캠페인 각각의 핵심 키워드와 기획 의도 분석</p>
+                </div>
+                <div class="flex gap-1 bg-white border border-slate-200 p-1 rounded-lg text-xs font-semibold">
+                    <button onclick="toggleDeepDiveView('grid')" id="btn-view-grid" class="view-toggle-btn px-3 py-1.5 rounded-md bg-emerald-600 text-white shadow-sm">그리드 뷰</button>
+                    <button onclick="toggleDeepDiveView('accordion')" id="btn-view-accordion" class="view-toggle-btn px-3 py-1.5 rounded-md text-slate-600 hover:text-slate-900">아코디언 리스트 뷰</button>
+                </div>
+            </div>
+
+            <!-- GRID VIEW CONTAINER -->
+            <div id="deepdive-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Card 1 -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow">
+                    <div class="p-5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white">
+                        <span class="text-[11px] bg-white/20 font-bold px-2 py-0.5 rounded-full uppercase">환경 캠페인 01</span>
+                        <h4 class="text-base font-bold mt-1.5">한 달에 한 번, 플로깅 데이</h4>
+                        <p class="text-emerald-100 text-xs mt-1 italic">"작은 행동이 기후정의로 이어진다"</p>
+                    </div>
+                    <div class="p-5 flex-grow flex flex-col justify-between space-y-4">
+                        <div class="space-y-3">
+                            <div>
+                                <span class="text-[10px] text-slate-400 font-bold block">핵심 키워드</span>
+                                <div class="flex flex-wrap gap-1 mt-1">
+                                    <span class="bg-slate-100 text-slate-700 text-[10px] px-2 py-0.5 rounded-md">기후정의</span>
+                                    <span class="bg-slate-100 text-slate-700 text-[10px] px-2 py-0.5 rounded-md">직접 행동</span>
+                                    <span class="bg-slate-100 text-slate-700 text-[10px] px-2 py-0.5 rounded-md">플로깅</span>
+                                    <span class="bg-slate-100 text-slate-700 text-[10px] px-2 py-0.5 rounded-md">매월 수요일</span>
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed">매달 마지막 주 수요일에 임직원들이 마스크와 장갑을 착용하고 거리 쓰레기를 주우며 캔, 플라스틱, 비닐 등을 체계적으로 분리수거하는 브랜드 주도형 환경 실천 프로그램입니다.</p>
+                            <div class="bg-emerald-50 p-3 rounded-xl border border-emerald-100 text-xs text-emerald-900">
+                                <strong class="block font-bold mb-1">발표 활용 포인트</strong>
+                                "친환경을 기업의 홍보 문구(Greenwashing)가 아니라 온몸으로 증명하는 브랜드 행동주의(Actionism)의 표본으로 활용"
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow">
+                    <div class="p-5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white">
+                        <span class="text-[11px] bg-white/20 font-bold px-2 py-0.5 rounded-full uppercase">환경 캠페인 02</span>
+                        <h4 class="text-base font-bold mt-1.5">일주일에 하루, #플라스틱없는날</h4>
+                        <p class="text-emerald-100 text-xs mt-1 italic">"완벽한 제로웨이스트보다 하루의 시도가 중요"</p>
+                    </div>
+                    <div class="p-5 flex-grow flex flex-col justify-between space-y-4">
+                        <div class="space-y-3">
+                            <div>
+                                <span class="text-[10px] text-slate-400 font-bold block">핵심 키워드</span>
+                                <div class="flex flex-wrap gap-1 mt-1">
+                                    <span class="bg-slate-100 text-slate-700 text-[10px] px-2 py-0.5 rounded-md">플라스틱프리</span>
+                                    <span class="bg-slate-100 text-slate-700 text-[10px] px-2 py-0.5 rounded-md">월요일 루틴</span>
+                                    <span class="bg-slate-100 text-slate-700 text-[10px] px-2 py-0.5 rounded-md">쉬운 실천</span>
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed">배달 증가로 극에 달한 일회용품 문제를 지적하고, 소비자들에게 매주 월요일 하루만큼은 의도적으로 플라스틱을 안 쓰는 문화를 제안하는 참여 유도형 캠페인입니다.</p>
+                            <div class="bg-emerald-50 p-3 rounded-xl border border-emerald-100 text-xs text-emerald-900">
+                                <strong class="block font-bold mb-1">발표 활용 포인트</strong>
+                                "부담을 주는 백점 만점의 환경운동 대신 '월요일만 실천하기'처럼 참여 허들을 대폭 낮추는 고체 비누 마케팅 기획의 모태"
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow">
+                    <div class="p-5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white">
+                        <span class="text-[11px] bg-white/20 font-bold px-2 py-0.5 rounded-full uppercase">환경 캠페인 03</span>
+                        <h4 class="text-base font-bold mt-1.5">2022 환경의 날 - 검은 숲</h4>
+                        <p class="text-emerald-100 text-xs mt-1 italic">"기후변화로 심화된 산불 피해와 자연을 기억"</p>
+                    </div>
+                    <div class="p-5 flex-grow flex flex-col justify-between space-y-4">
+                        <div class="space-y-3">
+                            <div>
+                                <span class="text-[10px] text-slate-400 font-bold block">핵심 키워드</span>
+                                <div class="flex flex-wrap gap-1 mt-1">
+                                    <span class="bg-slate-100 text-slate-700 text-[10px] px-2 py-0.5 rounded-md">산불 피해목</span>
+                                    <span class="bg-slate-100 text-slate-700 text-[10px] px-2 py-0.5 rounded-md">기후 위기</span>
+                                    <span class="bg-slate-100 text-slate-700 text-[10px] px-2 py-0.5 rounded-md">인센스 홀더</span>
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed">로컬 라이프 브랜드 '번투드'와 손을 잡고 산불 피해로 상처받은 고성 나무들을 업사이클링한 '인센스 홀더 검은 숲 에디션'을 펀딩·출시하여 수익금을 기금화한 캠페인입니다.</p>
+                            <div class="bg-emerald-50 p-3 rounded-xl border border-emerald-100 text-xs text-emerald-900">
+                                <strong class="block font-bold mb-1">발표 활용 포인트</strong>
+                                "제품의 생산과 비주얼 자체가 곧 사회 문제 해결을 시각적으로 대표하게 만드는 동구밭만의 상품 연동형 가치소비 모델"
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow">
+                    <div class="p-5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
+                        <span class="text-[11px] bg-white/20 font-bold px-2 py-0.5 rounded-full uppercase">장애 인식 캠페인 01</span>
+                        <h4 class="text-base font-bold mt-1.5">블루로드 캠페인 (2022)</h4>
+                        <p class="text-blue-100 text-xs mt-1 italic">"가능으로 이끌다 - 파란 장미의 기적"</p>
+                    </div>
+                    <div class="p-5 flex-grow flex flex-col justify-between space-y-4">
+                        <div class="space-y-3">
+                            <div>
+                                <span class="text-[10px] text-slate-400 font-bold block">핵심 키워드</span>
+                                <div class="flex flex-wrap gap-1 mt-1">
+                                    <span class="bg-slate-100 text-slate-700 text-[10px] px-2 py-0.5 rounded-md">파란 장미</span>
+                                    <span class="bg-slate-100 text-slate-700 text-[10px] px-2 py-0.5 rounded-md">도심 행진</span>
+                                    <span class="bg-slate-100 text-slate-700 text-[10px] px-2 py-0.5 rounded-md">비주얼 임팩트</span>
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed">장애인/비장애 사원 및 고객 팬덤 등 약 70여 명이 한목소리로 파란 장미(불가능의 극복을 상징)를 필두로 삼아 광화문 일대를 행진하며 편견 파괴를 부르짖은 참여형 거리 퍼포먼스입니다.</p>
+                            <div class="bg-blue-50 p-3 rounded-xl border border-blue-100 text-xs text-blue-900">
+                                <strong class="block font-bold mb-1">발표 활용 포인트</strong>
+                                "장애라는 소외된 담론을 '우울한 호소'가 아닌 파란색을 활용한 '힙하고 활력 넘치는 도심 속 이벤트'로 브랜딩한 영리함"
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 5 -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow">
+                    <div class="p-5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
+                        <span class="text-[11px] bg-white/20 font-bold px-2 py-0.5 rounded-full uppercase">장애 인식 캠페인 02</span>
+                        <h4 class="text-base font-bold mt-1.5">‘장인’ 에디션 캠페인</h4>
+                        <p class="text-blue-100 text-xs mt-1 italic">"Disability에서 dis를 제거하면 ability(능력)만 남는다"</p>
+                    </div>
+                    <div class="p-5 flex-grow flex flex-col justify-between space-y-4">
+                        <div class="space-y-3">
+                            <div>
+                                <span class="text-[10px] text-slate-400 font-bold block">핵심 키워드</span>
+                                <div class="flex flex-wrap gap-1 mt-1">
+                                    <span class="bg-slate-100 text-slate-700 text-[10px] px-2 py-0.5 rounded-md">무화과 설거지 비누</span>
+                                    <span class="bg-slate-100 text-slate-700 text-[10px] px-2 py-0.5 rounded-md">발달장애인 디자인</span>
+                                    <span class="bg-slate-100 text-slate-700 text-[10px] px-2 py-0.5 rounded-md">UX적 메시지</span>
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed">발달장애인 사원들이 직접 디자인한 패키지의 '무화과 설거지 비누'를 판매하며, 비누에 양각된 'Disability'가 물과 마찰하며 점차 닳아 'ability'만 남게 되는 혁신적인 메시지 시각화 제품입니다.</p>
+                            <div class="bg-blue-50 p-3 rounded-xl border border-blue-100 text-xs text-blue-900">
+                                <strong class="block font-bold mb-1">발표 활용 포인트</strong>
+                                "캠페인 카피를 단순히 인쇄하여 읽히는 것이 아니라, 제품을 실제로 닳게 만들어 사용하는 사용자 경험(UX)과 철학을 절묘하게 엮음"
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 6 -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow">
+                    <div class="p-5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
+                        <span class="text-[11px] bg-white/20 font-bold px-2 py-0.5 rounded-full uppercase">장애 인식 캠페인 03</span>
+                        <h4 class="text-base font-bold mt-1.5">일상에서 만나다 캠페인</h4>
+                        <p class="text-blue-100 text-xs mt-1 italic">"대한민국 인구 5%의 장애인, 그들은 다 어디에 숨었는가?"</p>
+                    </div>
+                    <div class="p-5 flex-grow flex flex-col justify-between space-y-4">
+                        <div class="space-y-3">
+                            <div>
+                                <span class="text-[10px] text-slate-400 font-bold block">핵심 키워드</span>
+                                <div class="flex flex-wrap gap-1 mt-1">
+                                    <span class="bg-slate-100 text-slate-700 text-[10px] px-2 py-0.5 rounded-md">일상 속 만남</span>
+                                    <span class="bg-slate-100 text-slate-700 text-[10px] px-2 py-0.5 rounded-md">의무고용률 3.4%</span>
+                                    <span class="bg-slate-100 text-slate-700 text-[10px] px-2 py-0.5 rounded-md">사회 통합</span>
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed">비장애 사원과 발달장애 사원이 일상에서 섞이지 않는 한국의 폐쇄적 현실을 문제 제기하고, 기업들의 장애인 의무 고용 비율 준수를 가시적 데이터로 설득한 사회 담론 형성형 액션입니다.</p>
+                            <div class="bg-blue-50 p-3 rounded-xl border border-blue-100 text-xs text-blue-900">
+                                <strong class="block font-bold mb-1">발표 활용 포인트</strong>
+                                "브랜드의 존재 이유가 수치적 준수(의무 고용)를 넘어 일상의 온전한 통합에 있음을 드러내며 ESG 핵심 주체로서의 입지 정교화"
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 7 -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow md:col-span-2 lg:col-span-3">
+                    <div class="p-5 bg-gradient-to-r from-slate-700 to-slate-800 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div>
+                            <span class="text-[11px] bg-white/20 font-bold px-2 py-0.5 rounded-full uppercase">장애 고용 캠페인 04</span>
+                            <h4 class="text-base font-bold mt-1.5">장애인 직업 재활의 날 캠페인 (2024)</h4>
+                        </div>
+                        <p class="text-slate-300 text-xs italic">"제 의지와 근성은 한 치도 흔들리지 않습니다"</p>
+                    </div>
+                    <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="md:col-span-2 space-y-3">
+                            <span class="text-[10px] text-slate-400 font-bold block">노승준 매니저 인터뷰 기반 스토리텔링</span>
+                            <p class="text-sm text-slate-700 leading-relaxed">
+                                사무보조, 청소, 재고 분석, 미군부대 파견 등에서 주 4시간에서 8시간 완일 근무로 성장해 나가는 실제 직원의 눈부신 여정을 다큐멘터리 형식의 인터뷰 아티클로 풀어낸 동구밭의 대표적 인물 포커싱 캠페인입니다.
+                            </p>
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 text-xs text-slate-600 space-y-1">
+                                <strong class="text-slate-800 font-bold block">담당 중요 직무 상세:</strong>
+                                <p>• 동구밭 내부 사무보조 및 총무업무</p>
+                                <p>• 오프라인 숍 관리 및 정기적 실사 및 재고 모니터링 수행</p>
+                                <p>• 미군부대, 킨텍스 외부 파견 근무 시 체력적, 환경적 장벽을 극복하며 8시간 업무 완수</p>
+                            </div>
+                        </div>
+                        <div class="bg-indigo-50 p-4 rounded-2xl border border-indigo-100 flex flex-col justify-between">
+                            <h5 class="font-bold text-xs text-indigo-900 flex items-center gap-1">
+                                <i class="fa-solid fa-medal"></i> 인터뷰 마케팅의 강점
+                            </h5>
+                            <p class="text-xs text-indigo-800 leading-relaxed mt-2">
+                                소비자는 연출된 광고주의 목소리보다 <strong>실제 수혜를 받고 당당히 성취하는 사원의 입술</strong>을 통해 브랜드를 직접 신뢰하게 됩니다. 추상적인 '착함'이 가장 입체적인 '설득력'으로 업그레이드되는 인터뷰 전술입니다.
+                            </p>
+                            <div class="text-[11px] text-indigo-500 font-semibold mt-3 text-right">#의지 #성장하는구성원 #정교한일터</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ACCORDION VIEW CONTAINER -->
+            <div id="deepdive-accordion" class="hidden space-y-3">
+                <!-- Accordion item generator -->
+                <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+                    <button onclick="toggleAccordion(1)" class="w-full px-6 py-4 text-left font-bold text-slate-800 hover:bg-slate-50 flex justify-between items-center">
+                        <span class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                            1. 한 달에 한 번, 플로깅 데이
+                        </span>
+                        <i id="acc-arrow-1" class="fa-solid fa-chevron-down text-xs transition-transform"></i>
+                    </button>
+                    <div id="acc-content-1" class="hidden border-t border-slate-100 p-6 bg-slate-50 text-sm text-slate-600 space-y-2">
+                        <p><strong>핵심 메시지:</strong> 작은 행동이 기후정의로 연결된다</p>
+                        <p><strong>마케팅 관점:</strong> 광고 카피나 포장지가 아닌 임직원의 자발적 노동과 쓰레기 분류 행위 그 자체를 하나의 환경 행동주의 미학으로 브랜드 성장에 대입한 우수 브랜딩 사례.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+                    <button onclick="toggleAccordion(2)" class="w-full px-6 py-4 text-left font-bold text-slate-800 hover:bg-slate-50 flex justify-between items-center">
+                        <span class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                            2. 일주일에 하루, #플라스틱없는날
+                        </span>
+                        <i id="acc-arrow-2" class="fa-solid fa-chevron-down text-xs transition-transform"></i>
+                    </button>
+                    <div id="acc-content-2" class="hidden border-t border-slate-100 p-6 bg-slate-50 text-sm text-slate-600 space-y-2">
+                        <p><strong>핵심 메시지:</strong> 완벽한 제로웨이스트보다는 하나의 소박한 첫 시작</p>
+                        <p><strong>마케팅 관점:</strong> 코로나 19 시기 일회용품 남용 문제에 직면해 소비자들에게 도덕적 단죄가 아닌 '월요일 하루 가볍게 플라스틱을 차단하는 놀이' 형태로 정서적 동조를 이끌어냄.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+                    <button onclick="toggleAccordion(3)" class="w-full px-6 py-4 text-left font-bold text-slate-800 hover:bg-slate-50 flex justify-between items-center">
+                        <span class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                            3. 2022 환경의 날 - 검은 숲
+                        </span>
+                        <i id="acc-arrow-3" class="fa-solid fa-chevron-down text-xs transition-transform"></i>
+                    </button>
+                    <div id="acc-content-3" class="hidden border-t border-slate-100 p-6 bg-slate-50 text-sm text-slate-600 space-y-2">
+                        <p><strong>핵심 메시지:</strong> 산불 피해목과 기후 위기를 영원히 기억하기</p>
+                        <p><strong>마케팅 관점:</strong> 소나무 산불 피해목을 직접 자르고 다듬어 향 홀더 제품으로 가치화하고, 구매 금액 일부를 조림 사업 기금으로 매끄럽게 순환 유도한 지속 가능한 오프젝트 마케팅.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+                    <button onclick="toggleAccordion(4)" class="w-full px-6 py-4 text-left font-bold text-slate-800 hover:bg-slate-50 flex justify-between items-center">
+                        <span class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                            4. 2022 장애인의 날 블루로드 캠페인
+                        </span>
+                        <i id="acc-arrow-4" class="fa-solid fa-chevron-down text-xs transition-transform"></i>
+                    </button>
+                    <div id="acc-content-4" class="hidden border-t border-slate-100 p-6 bg-slate-50 text-sm text-slate-600 space-y-2">
+                        <p><strong>핵심 메시지:</strong> 불가능을 기적으로 이끌어낸다 (파란 장미)</p>
+                        <p><strong>마케팅 관점:</strong> 장애에 가두어진 무기력한 수사를 뒤엎고 시청, 종로 거리 일대를 가득 채운 푸른색 피켓과 로고 티셔츠로 브랜드 고유의 '행복하고 열정 넘치는 자활 일꾼'들의 정체성을 각인함.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+                    <button onclick="toggleAccordion(5)" class="w-full px-6 py-4 text-left font-bold text-slate-800 hover:bg-slate-50 flex justify-between items-center">
+                        <span class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                            5. 2022 국제 장애인의 날 ‘장인’ 에디션
+                        </span>
+                        <i id="acc-arrow-5" class="fa-solid fa-chevron-down text-xs transition-transform"></i>
+                    </button>
+                    <div id="acc-content-5" class="hidden border-t border-slate-100 p-6 bg-slate-50 text-sm text-slate-600 space-y-2">
+                        <p><strong>핵심 메시지:</strong> Disability에서 dis가 소멸하면 오직 능력(ability)만 남는다</p>
+                        <p><strong>마케팅 관점:</strong> 비누 사용 주기에 따라 각인된 텍스트가 마모되는 인터랙션을 브랜드 소비에 개입시킴으로써 장애인의 주체적인 일솜씨와 가치를 놀라운 비주얼 스토리로 증명함.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+                    <button onclick="toggleAccordion(6)" class="w-full px-6 py-4 text-left font-bold text-slate-800 hover:bg-slate-50 flex justify-between items-center">
+                        <span class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                            6. 2023 일상에서 만나다
+                        </span>
+                        <i id="acc-arrow-6" class="fa-solid fa-chevron-down text-xs transition-transform"></i>
+                    </button>
+                    <div id="acc-content-6" class="hidden border-t border-slate-100 p-6 bg-slate-50 text-sm text-slate-600 space-y-2">
+                        <p><strong>핵심 메시지:</strong> 장벽 없는 세상, 당연한 의무고용 3.4%</p>
+                        <p><strong>마케팅 관점:</strong> 시혜적인 눈물을 거두고 기업 생태계 내 장애 의무 고용률 미달 문제를 공적 담론으로 수면 위에 인출함으로써 신선하고 책임감 있는 브랜드 이념을 어필함.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+                    <button onclick="toggleAccordion(7)" class="w-full px-6 py-4 text-left font-bold text-slate-800 hover:bg-slate-50 flex justify-between items-center">
+                        <span class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-slate-700"></span>
+                            7. 2024 장애인 직업 재활의 날 캠페인 (노승준 매니저 인터뷰)
+                        </span>
+                        <i id="acc-arrow-7" class="fa-solid fa-chevron-down text-xs transition-transform"></i>
+                    </button>
+                    <div id="acc-content-7" class="hidden border-t border-slate-100 p-6 bg-slate-50 text-sm text-slate-600 space-y-2">
+                        <p><strong>핵심 메시지:</strong> 일하고 적응하며 살아가는 성실함, 그것은 장벽이 없다</p>
+                        <p><strong>마케팅 관점:</strong> 단순한 홍보를 포기하고 실제 오피스 청소, 재고 실사, 파견직에서 활약하는 구체적인 주 8시간 근로 사원의 서사로 대중의 마음을 깊숙이 울린 고유의 브랜디드 저널리즘 기법.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB 3: STRATEGY BRIDGE ==================== -->
+        <div id="panel-strategy" class="tab-panel hidden space-y-8">
+            <div class="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+                <div>
+                    <h3 class="text-xl font-bold text-slate-900">조별 과제 발표의 핵심: 전략 브릿지(Strategy Bridge)</h3>
+                    <p class="text-xs text-slate-500">기존 동구밭 마케팅의 강점과 약점을 입체적으로 파악하고 새롭게 제안하는 차세대 캠페인과의 인과관계를 설명합니다.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Column 1: Existing Campaign Analysis -->
+                    <div class="bg-slate-50 rounded-2xl p-6 border border-slate-200 space-y-4">
+                        <div class="flex items-center gap-2 text-emerald-800 font-bold text-sm">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span> 기존 동구밭의 위대한 강점
+                        </div>
+                        <ul class="space-y-3 text-xs text-slate-600">
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-circle-check text-emerald-600 mt-0.5"></i>
+                                <span><strong>확고부동한 진정성(Authenticity)</strong>: 비즈니스 중심이 아닌, 기후 변화와 장애 고용이라는 숭고한 영역에 실제 직원들이 도심으로 뛰쳐나가 직접 몸소 증명.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-circle-check text-emerald-600 mt-0.5"></i>
+                                <span><strong>참여 장벽 완화 시도</strong>: '#플라스틱없는날'처럼 고차원적 친환경을 일주일에 단 하루 실천으로 번역하는 심리적 다리 건설 능력이 탁월.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-circle-check text-emerald-600 mt-0.5"></i>
+                                <span><strong>제품 경험 중심 디자인</strong>: 글자 'dis'가 닳고 'ability'만 남는 무화과 비누 패키징 등 예술적 아이디어 보유.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 2: Unresolved Pain Points -->
+                    <div class="bg-rose-50/50 rounded-2xl p-6 border border-rose-100 space-y-4">
+                        <div class="flex items-center gap-2 text-rose-800 font-bold text-sm">
+                            <span class="w-2.5 h-2.5 rounded-full bg-rose-600"></span> 극복해야 할 명확한 페인포인트 (아쉬운 점)
+                        </div>
+                        <ul class="space-y-3 text-xs text-slate-600">
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-circle-exclamation text-rose-600 mt-0.5"></i>
+                                <span><strong>첫 경험 유입 장벽(Entry Barrier)</strong>: "플라스틱 없애자"는 이념에는 고개가 끄덕여지나, "오늘 밤 내 머리를 동구밭 샴푸바로 감아야 하는" 세부 유인 및 혜택 장치가 약함.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-circle-exclamation text-rose-600 mt-0.5"></i>
+                                <span><strong>미인지 대중의 전환 부족</strong>: 가치소비에 민감한 2030 열성층을 제외하고 액체 형태 세제에 장기 길들여진 수백만 명의 메인스트림 소비자를 비누 세계로 끌고 올 자극이 미비함.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Strategic Transition Graphic -->
+                <div class="p-6 bg-emerald-50 rounded-2xl border border-emerald-100/80 space-y-4">
+                    <h4 class="text-xs font-bold text-emerald-900 uppercase tracking-wider text-center">우리가 제안할 핵심 논리 터널</h4>
+                    <div class="flex flex-col lg:flex-row items-center justify-between gap-4 text-center">
+                        <div class="bg-white p-4 rounded-xl border border-emerald-100 shadow-xs w-full lg:w-1/3">
+                            <span class="text-[10px] bg-slate-100 text-slate-500 font-bold px-2 py-0.5 rounded-full block mx-auto w-max mb-1">기존 포지션</span>
+                            <span class="text-xs font-bold text-slate-800">"지구와 이웃을 위한 착하고 굳센 가치 행동"</span>
+                        </div>
+                        <div class="text-emerald-600 text-xl font-bold rotate-90 lg:rotate-0">
+                            <i class="fa-solid fa-circle-right"></i>
+                        </div>
+                        <div class="bg-emerald-600 text-white p-4 rounded-xl shadow-md w-full lg:w-1/3">
+                            <span class="text-[10px] bg-white/20 text-emerald-100 font-bold px-2 py-0.5 rounded-full block mx-auto w-max mb-1">우리의 연계 아이디어</span>
+                            <span class="text-xs font-bold">"7일 고체생활 입문 챌린지"</span>
+                        </div>
+                        <div class="text-emerald-600 text-xl font-bold rotate-90 lg:rotate-0">
+                            <i class="fa-solid fa-circle-right"></i>
+                        </div>
+                        <div class="bg-slate-900 text-white p-4 rounded-xl w-full lg:w-1/3">
+                            <span class="text-[10px] bg-amber-500/20 text-amber-300 font-bold px-2 py-0.5 rounded-full block mx-auto w-max mb-1">기대 마케팅 성과</span>
+                            <span class="text-xs font-bold">"신규 체험 유입 극대화 & 고체 비누 일상 습관 정착"</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 7 Day Challenge Concept Card -->
+                <div class="border border-slate-200 rounded-2xl p-6 bg-slate-50 space-y-4">
+                    <h4 class="font-bold text-slate-900 text-sm">연계 캠페인 스케치: <span class="text-emerald-700">“7일 고체생활 입문 캠페인 (Solid Life Challenge)”</span></h4>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        동구밭의 <strong>'플라스틱 없는 날'</strong> 사상에서 착안하여, 아직 고체 화장품을 접하지 않은 대학생, 직장인, 주부들이 부담 없이 7일 동안 고체 라이프를 실현해 보도록 돕는 <strong>키트 처방 및 가이드 기반 온오프라인 캠페인</strong>입니다.
+                    </p>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                        <div class="bg-white p-4 rounded-xl border border-slate-200">
+                            <div class="text-xs font-bold text-slate-800">1. 부담 없는 미니 7일 키트</div>
+                            <p class="text-[11px] text-slate-500 mt-1">부피가 크고 비싼 정품 대신 일주일 분량의 세안, 샴푸, 설거지 미니 비누가 든 '비기너 체험팩'을 초저가 혹은 무료 증정(배송비만 결제)으로 판매하여 전환율 유도.</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-slate-200">
+                            <div class="text-xs font-bold text-slate-800">2. 게이미피케이션 습관 지도</div>
+                            <p class="text-[11px] text-slate-500 mt-1">하루에 한 칸씩 뜯어 쓰는 습관 캘린더나 귀여운 모바일 발도장 퀘스트를 매칭하여 7일간의 지루하지 않은 완주 독려.</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-slate-200">
+                            <div class="text-xs font-bold text-slate-800">3. 가치 성장의 정량적 시각화</div>
+                            <p class="text-[11px] text-slate-500 mt-1">7일간 절약한 플라스틱 생수병 개수, 물 절약량, 발달장애인 노동 창출 기여 시간 등을 한눈에 영수증 형식으로 카톡 전송.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB 4: SLIDE DECK ==================== -->
+        <div id="panel-pitch" class="tab-panel hidden space-y-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-xl font-bold text-slate-900">조별 모임/발표용 미니 피치 덱</h3>
+                    <p class="text-xs text-slate-500">발표 현장에서 바로 넘겨 가며 스피치 대본을 확인하고 핵심을 보고할 수 있는 툴입니다.</p>
+                </div>
+                <div class="text-xs text-slate-400 font-semibold" id="slide-count">1 / 5</div>
+            </div>
+
+            <!-- Slide Canvas -->
+            <div class="bg-white border-2 border-slate-300 rounded-3xl shadow-lg aspect-video max-w-4xl mx-auto flex flex-col justify-between p-8 sm:p-12 relative overflow-hidden select-none">
+                <!-- Watermark Background -->
+                <div class="absolute -right-16 -bottom-16 text-slate-100 text-[300px] font-bold z-0 pointer-events-none">
+                    DGB
+                </div>
+
+                <!-- Slide Top Header -->
+                <div class="flex justify-between items-center z-10 border-b border-slate-100 pb-4">
+                    <span class="text-emerald-700 font-bold tracking-wider text-xs uppercase" id="slide-category">Introduction</span>
+                    <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full" id="slide-index">Slide 01</span>
+                </div>
+
+                <!-- Slide Main Content (Interactive Injection) -->
+                <div class="z-10 py-4" id="slide-content-area">
+                    <!-- Dynamic content will load here -->
+                </div>
+
+                <!-- Slide Footer Navigation -->
+                <div class="flex justify-between items-center z-10 border-t border-slate-100 pt-4">
+                    <button onclick="prevSlide()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold px-4 py-2 rounded-xl transition-colors">
+                        <i class="fa-solid fa-arrow-left mr-1"></i> 이전 장
+                    </button>
+                    <!-- Nav Bullets -->
+                    <div class="flex gap-1.5" id="slide-bullets">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-slate-200"></span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-slate-200"></span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-slate-200"></span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-slate-200"></span>
+                    </div>
+                    <button onclick="nextSlide()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-4 py-2 rounded-xl transition-colors shadow-sm shadow-emerald-700/10">
+                        다음 장 <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Presenter Notes Box -->
+            <div class="max-w-4xl mx-auto bg-slate-900 text-slate-300 p-5 rounded-2xl border border-slate-800 space-y-2">
+                <span class="text-[10px] bg-emerald-500/20 text-emerald-400 font-bold px-2.5 py-1 rounded-md uppercase">
+                    <i class="fa-solid fa-comment-dots mr-1"></i> 발표자 스피치 대본 가이드 (Presenter Note)
+                </span>
+                <p class="text-xs sm:text-sm leading-relaxed text-slate-300" id="slide-note">
+                    로드 대기 중...
+                </p>
+            </div>
+        </div>
+
+        <!-- ==================== TAB 5: SHARE TOOLKIT ==================== -->
+        <div id="panel-share" class="tab-panel hidden space-y-6">
+            <div class="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+                <div>
+                    <h3 class="text-xl font-bold text-slate-900">단톡방 및 노션 공유 텍스트 빌더</h3>
+                    <p class="text-xs text-slate-500">조원이나 교수님, 팀원들에게 카카오톡, 피그마 혹은 노션에 보낼 수 있는 가독성 높은 텍스트 템플릿입니다. 간편하게 복사해 보세요.</p>
+                </div>
+
+                <div class="relative">
+                    <textarea id="share-textbox" readonly class="w-full h-96 p-5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-mono leading-relaxed text-slate-700 focus:outline-none custom-scrollbar">
+🍀 동구밭 브랜드 캠페인 분석 및 2차 전략 연계안 🍀
+
+안녕하세요 팀원 여러분! 동구밭 기존 마케팅 캠페인을 면밀히 분석하고 우리 발표 전략 방향과 매끄럽게 어긋남 없이 정렬하여 짧게 요약 공유해 드립니다!
+
+1. 동구밭의 기존 2대 축 캠페인
+✅ [환경·기후정의 축]
+- 플로깅 데이: 매달 마지막 주 수요일 거리 청소 및 분류. 말 대신 행동으로 브랜드 신용 증강.
+- #플라스틱없는날: 매주 월요일 제안. 소비자가 따라 하기 쉬운 마일드한 루틴 기획.
+- 검은 숲: 산불 피해목 업사이클링 굿즈 및 기금화. 사회문제를 제품과 직접 결착.
+
+✅ [장애 고용·인식 개선 축]
+- 블루로드 캠페인: 불가능을 가능케 하는 '파란 장미' 시청 광화문 도심 활력 행진.
+- '장인' 에디션: 사용하며 'Disability'에서 'dis'가 마모되어 'ability'만 남는 설거지 비누 UX.
+- 일상에서 만나다: 인구 5% 장애인의 일상 공존과 의무고용률 3.4% 준수를 일깨움.
+- 직업 재활의 날 (노승준 매니저): 실제 8시간 완일 사원의 고군분투 서사로 눈물 대신 신뢰 창출.
+
+2. 우리의 핵심 마케팅 인사이트 및 한계 (Weakness)
+- 기존 액션들은 '동구밭의 숭고한 정신'을 세우는 데는 절대 성공적이나, 동구밭 비누를 한 번도 안 써본 비경험 고객들이 '장바구니'에 비누를 담을 수 있게 하는 구체적 체험 기폭 장치가 부족합니다.
+
+3. 2차 발표 아이디어 제안
+- "7일 고체생활 입문 챌린지"
+- 기존 '#플라스틱없는날'의 소박한 실천론을 계승하여 미경험 입문자가 단 7일 동안 미니 패키징 키트를 통해 고체 생활의 질감을 체험하고, 이를 게이밍 습관 및 기여 수치(아낀 플라스틱량 등)로 환산 전송받는 체험 중심의 신규 유저 유입 마케팅을 제안합니다.
+
+회의 시간 때 이 분석 방향으로 교수님 피드백 및 다음 마케팅 로드맵 구조를 짜 보면 설득력 높은 발표가 될 것 같은데 다들 편하게 보시고 피드백 주시면 감사하겠습니다!</textarea>
+                    
+                    <button onclick="copyShareText()" class="absolute right-4 bottom-4 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs px-4 py-2.5 rounded-xl shadow-md transition-all flex items-center gap-1.5">
+                        <i class="fa-solid fa-copy"></i> 전체 텍스트 클립보드 복사
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Custom Toast Message Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-900 text-white text-xs px-4 py-3 rounded-xl shadow-xl flex items-center gap-2">
+        <i class="fa-solid fa-circle-check text-emerald-400"></i>
+        <span id="toast-msg">텍스트가 정상적으로 복사되었습니다.</span>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-6 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs space-y-2">
+            <p>© 2026 동구밭 브랜드 서포터즈 스터디 자료. 이 페이지는 조별 전략 기획 및 발표 목적으로 인터랙티브하게 제작되었습니다.</p>
+            <p class="text-slate-500">본 대시보드는 동구밭의 공공 아카이빙 자료를 바탕으로 재구성되었으며 상업적 무단 도용을 금합니다.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Tab switching logic
+        function switchTab(tabId) {
+            // Hide all tab panels
+            document.querySelectorAll('.tab-panel').forEach(panel => {
+                panel.classList.add('hidden');
+            });
+            // Show requested panel
+            document.getElementById(`panel-${tabId}`).classList.remove('hidden');
+
+            // Reset navigation highlight (Desktop)
+            document.querySelectorAll('#nav-tabs button').forEach(btn => {
+                btn.className = "tab-btn px-4 py-2 text-sm font-medium rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-50";
+            });
+            // Highlight active button (Desktop)
+            const activeBtn = document.getElementById(`tab-${tabId}`);
+            if(activeBtn) {
+                activeBtn.className = "tab-btn px-4 py-2 text-sm font-medium rounded-lg bg-emerald-50 text-emerald-700";
+            }
+
+            // Reset navigation highlight (Mobile)
+            document.querySelectorAll('#mobile-menu button').forEach(btn => {
+                btn.className = "w-full text-left px-4 py-2 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50 block";
+            });
+            // Highlight active button (Mobile)
+            const mActiveBtn = document.getElementById(`m-tab-${tabId}`);
+            if(mActiveBtn) {
+                mActiveBtn.className = "w-full text-left px-4 py-2 text-sm font-medium rounded-lg bg-emerald-50 text-emerald-700 block";
+            }
+
+            // Close mobile menu if open
+            document.getElementById('mobile-menu').classList.add('hidden');
+        }
+
+        // Mobile Menu Toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Filter the Campaign Matrix Table
+        function filterMatrix(category) {
+            // Update filter buttons appearance
+            document.querySelectorAll('.matrix-filter-btn').forEach(btn => {
+                btn.className = "matrix-filter-btn px-3 py-1.5 rounded-md text-slate-600 hover:text-slate-900";
+            });
+            document.getElementById(`filter-${category}`).className = "matrix-filter-btn px-3 py-1.5 rounded-md bg-white text-slate-800 shadow-sm";
+
+            // Row display manipulation
+            document.querySelectorAll('.campaign-row').forEach(row => {
+                if(category === 'all') {
+                    row.classList.remove('hidden');
+                } else if(category === 'env') {
+                    if(row.classList.contains('env-row')) row.classList.remove('hidden');
+                    else row.classList.add('hidden');
+                } else if(category === 'dis') {
+                    if(row.classList.contains('dis-row')) row.classList.remove('hidden');
+                    else row.classList.add('hidden');
+                }
+            });
+        }
+
+        // Toggle Views in Deep Dive
+        function toggleDeepDiveView(viewType) {
+            const grid = document.getElementById('deepdive-grid');
+            const accordion = document.getElementById('deepdive-accordion');
+            const btnGrid = document.getElementById('btn-view-grid');
+            const btnAcc = document.getElementById('btn-view-accordion');
+
+            // Reset buttons styling
+            btnGrid.className = "view-toggle-btn px-3 py-1.5 rounded-md text-slate-600 hover:text-slate-900";
+            btnAcc.className = "view-toggle-btn px-3 py-1.5 rounded-md text-slate-600 hover:text-slate-900";
+
+            if (viewType === 'grid') {
+                grid.classList.remove('hidden');
+                accordion.classList.add('hidden');
+                btnGrid.className = "view-toggle-btn px-3 py-1.5 rounded-md bg-emerald-600 text-white shadow-sm";
+            } else {
+                grid.classList.add('hidden');
+                accordion.classList.remove('hidden');
+                btnAcc.className = "view-toggle-btn px-3 py-1.5 rounded-md bg-emerald-600 text-white shadow-sm";
+            }
+        }
+
+        // Accordion behavior
+        function toggleAccordion(id) {
+            const content = document.getElementById(`acc-content-${id}`);
+            const arrow = document.getElementById(`acc-arrow-${id}`);
+            
+            if(content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                arrow.classList.add('rotate-180');
+            } else {
+                content.classList.add('hidden');
+                arrow.classList.remove('rotate-180');
+            }
+        }
+
+        const slidesData = [
+            {
+                category: "Introduction",
+                title: "브랜드가 '말'하지 않고 직접 '행동'하는 진정성",
+                tagline: "동구밭 캠페인은 단순 광고가 아닌, 사회적 행동주의의 결과물입니다.",
+                bullets: [
+                    "매달 쓰레기를 줍는 플로깅 데이: 그린워싱을 극복하는 직접 실천",
+                    "#플라스틱없는날 캠페인: 대중의 실천 장벽을 낮추는 매주 월요일 일상 챌린지",
+                    "검은 숲 에디션: 피해목 가공을 통한 사회적 문제를 실제 굿즈 및 기부금으로 매칭"
+                ],
+                notes: "우리가 준비할 동구밭 분석의 서두는 기존 캠페인들의 높은 진정성입니다. 동구밭은 친환경을 말장난이 아닌 행동으로 규정하는 브랜드입니다. 특히 일주일에 단 하루만 실천하라는 '플라스틱없는날'은 대중과의 정서적 친밀감을 구축하는 우수한 마케팅입니다."
+            },
+            {
+                category: "Disability Core Value",
+                title: "편견에서 기적으로, 가능성을 일상으로",
+                tagline: "장애를 슬픔이 아닌, 도심 속 빛나는 파란 장미의 기적으로 비주얼라이즈했습니다.",
+                bullets: [
+                    "블루로드 캠페인: 파란 장미의 새로운 기적이라는 상징을 필두로 도심 일대를 행진",
+                    "'장인' 에디션 설거지 비누: Disability 글자가 물에 녹아 ability로 변화하는 놀라운 실용 경험",
+                    "일상에서 만나다 캠페인: 인구 5% 장애를 특별한 소외자가 아닌 일상의 이웃으로 편입"
+                ],
+                notes: "두 번째 핵심 축인 장애인 복지는 '기적과 자활'입니다. 블루로드의 파란 장미 같은 시각적 연출과 장애인 사원이 만든 비누를 사용하며 글자가 소멸하는 것을 눈으로 직접 보며 감상하는 UX는 브랜드 몰입도를 극도로 높여줍니다."
+            },
+            {
+                category: "Human Storytelling",
+                title: "일하는 보람, 흔들리지 않는 근성",
+                tagline: "실제 장애 사원의 목소리를 인터뷰로 다루어, 브랜드 영혼의 성실함을 가득 채웠습니다.",
+                bullets: [
+                    "2024년 직업 재활의 날 노승준 매니저 인터뷰 스토리",
+                    "오프라인 매장 재고 점검, 내부 청소, 미군부대 파견 근로 등 정교한 업무 일체 수행",
+                    "주 4시간에서 8시간 완정 근무로 점진적 도약 및 자활 역량 시각화"
+                ],
+                notes: "2024년도에는 사람을 전면에 배치했습니다. 실제 8시간을 일하고 보람을 갖는 발달장애 사원의 업무 기록을 날것 그대로 인터뷰해 냄으로써, 기업들이 사회 공헌을 일방적 기부가 아닌 '지속가능한 일자리 창출'로 풀어내야 함을 영리하게 역설했습니다."
+            },
+            {
+                category: "Problem Definition",
+                title: "넘을 수 없는 장벽: 미경험 메인스트림 고객의 부재",
+                tagline: "동구밭의 영혼은 너무나 따스하지만, 비누를 한 번도 안 써본 소비자의 벽은 견고합니다.",
+                bullets: [
+                    "인지 및 충성도는 높으나, 브랜드 행동(비누 구매)으로 유도하는 직접 수단(CTA) 부족",
+                    "샴푸바나 설거지바가 친숙하지 않은 액체 세제 중심 가구의 거부감 잔류",
+                    "가치소비에 치중된 커뮤니티 외 대다수 주류 대중에게 브랜드 전파 장치 소강"
+                ],
+                notes: "이제 우리의 분석적 아쉬운 점을 짚어줍니다. '그래 동구밭 좋은 브랜드네, 그런데 내가 오늘 저 비누를 사야 하나?'라는 실천 단계의 벽이 있습니다. 제품을 한 번도 안 써본 비경험자에게는 거부감이 있기 때문에 이들을 비누의 일상으로 정복해야 할 브릿지 전략이 절실합니다."
+            },
+            {
+                category: "Proposed Idea",
+                title: "우리의 Solution: 7일 고체생활 입문 캠페인",
+                tagline: "플라스틱 없는 날의 사상을 이어받아, 고체 화장품의 매끈한 첫 경험을 배송합니다.",
+                bullets: [
+                    "일주일 가볍게 처방하는 '7일 고체화장품 스타터팩' 키트 전략",
+                    "습관 캘린더나 귀여운 모바일 게이미피케이션 연동을 통해 하루하루 완주 동기 유발",
+                    "성과의 가시화: '당신의 7일이 세이브한 플라스틱 8개와 발달장애 근로시간 24분'의 영수증"
+                ],
+                notes: "대망의 피날레 전략 제안입니다. 동구밭의 '작은 실천론'을 고체 비누 첫 구매 퍼널로 활용하는 '7일 고체생활 입문 캠페인'입니다. 저렴한 첫 체험 팩, 성취를 보여주는 카카오톡 영수증 등 기발한 체험 가시화를 통해 신규 동구밭지기를 창출해내자는 제안으로 교수님과 동료들의 시선을 사로잡을 수 있습니다."
+            }
+        ];
+
+        let currentSlide = 0;
+
+        function updateSlide() {
+            const slide = slidesData[currentSlide];
+            
+            // Render Slide Contents
+            const contentArea = document.getElementById('slide-content-area');
+            let bulletListHTML = '';
+            slide.bullets.forEach(bullet => {
+                bulletListHTML += `
+                    <li class="flex items-start gap-2.5 text-xs sm:text-sm text-slate-700">
+                        <i class="fa-solid fa-square-check text-emerald-600 mt-1 flex-shrink-0"></i>
+                        <span>${bullet}</span>
+                    </li>
+                `;
+            });
+
+            contentArea.innerHTML = `
+                <div class="space-y-4">
+                    <h3 class="text-xl sm:text-2xl font-black text-slate-900 leading-tight">${slide.title}</h3>
+                    <p class="text-xs sm:text-sm text-slate-500 font-medium">${slide.tagline}</p>
+                    <ul class="space-y-3 mt-4 pt-2 border-t border-slate-50">
+                        ${bulletListHTML}
+                    </ul>
+                </div>
+            `;
+
+            // Render presenter note
+            document.getElementById('slide-note').innerHTML = slide.notes;
+
+            // Render header category & index
+            document.getElementById('slide-category').textContent = slide.category;
+            document.getElementById('slide-index').textContent = `Slide 0${currentSlide + 1}`;
+            document.getElementById('slide-count').textContent = `${currentSlide + 1} / ${slidesData.length}`;
+
+            // Render Navigation Bullets
+            const bulletsContainer = document.getElementById('slide-bullets');
+            bulletsContainer.innerHTML = '';
+            for(let i=0; i<slidesData.length; i++) {
+                const bullet = document.createElement('span');
+                bullet.className = `w-2.5 h-2.5 rounded-full ${i === currentSlide ? 'bg-emerald-600 scale-125' : 'bg-slate-200'} transition-all`;
+                bulletsContainer.appendChild(bullet);
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            } else {
+                showToast("첫 번째 슬라이드입니다.");
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlide < slidesData.length - 1) {
+                currentSlide++;
+                updateSlide();
+            } else {
+                showToast("마지막 슬라이드입니다.");
+            }
+        }
+
+        // Clip board Copy with Custom Toast
+        function copyShareText() {
+            const textEl = document.getElementById('share-textbox');
+            textEl.select();
+            textEl.setSelectionRange(0, 99999); // For mobile devices
+            
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showToast("단톡방 공유용 텍스트가 클립보드에 성공적으로 복사되었습니다!");
+                } else {
+                    showToast("복사에 실패했습니다. 마우스 드래그로 복사해 주세요.");
+                }
+            } catch (err) {
+                showToast("복사 에러가 발생했습니다. 직접 긁어서 복사해 주세요.");
+            }
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = msg;
+            
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // Initialize Slides on load
+        window.onload = function() {
+            updateSlide();
+        }
+    </script>
+</body>
+</html>
