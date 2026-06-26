@@ -215,15 +215,37 @@ body.single-slide-mode .slide-card {
 
 .date-badge-flat {
   background-color: var(--color-dark-beige);
-  color: var(--color-green);
+  color: var(--color-green) !important;
   padding: 16px 36px;
   border-radius: 40px;
   font-size: 24px;
   font-weight: 700;
-  display: inline-flex;
-  align-items: center;
-  gap: 15px;
+  display: inline-block;
+  text-align: center;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  line-height: 1.2;
+  position: relative;
+  z-index: 4;
+}
+
+.date-badge-flat svg.calendar-svg {
+  width: 24px;
+  height: 24px;
+  fill: var(--color-green);
+  vertical-align: middle;
+  margin-right: 8px;
+  display: inline-block;
+}
+
+.date-badge-flat span {
+  display: inline-block;
+  vertical-align: middle;
+  color: var(--color-green) !important;
+}
+
+.date-badge-flat span.arrow-right {
+  color: var(--color-orange) !important;
+  margin-left: 8px;
 }
 
 .arrow-right {
@@ -372,13 +394,22 @@ body.single-slide-mode .slide-card {
   font-weight: 800;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 15px;
   margin-bottom: 25px;
   box-shadow: 0 10px 25px rgba(11, 59, 36, 0.2);
+  position: relative;
+  z-index: 4;
 }
 
-.truck-icon {
-  font-size: 44px;
+.truck-svg {
+  width: 48px;
+  height: 48px;
+  fill: var(--color-beige);
+}
+
+.pill-text {
+  color: var(--color-beige);
 }
 
 .sub-condition {
@@ -557,11 +588,10 @@ body.single-slide-mode .slide-card {
 }
 
 .cta-button-flat-beige {
-  display: inline-flex;
-  align-items: center;
-  gap: 20px;
+  display: inline-block;
+  text-align: center;
   background-color: var(--color-beige);
-  color: var(--color-green);
+  color: var(--color-green) !important;
   text-decoration: none;
   font-size: 32px;
   font-weight: 800;
@@ -569,6 +599,20 @@ body.single-slide-mode .slide-card {
   border-radius: 50px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
   transition: transform 0.2s, background-color 0.2s;
+  line-height: 1.2;
+  position: relative;
+  z-index: 4;
+}
+
+.cta-button-flat-beige span {
+  display: inline-block;
+  vertical-align: middle;
+  color: var(--color-green) !important;
+}
+
+.cta-button-flat-beige span.cta-arrow {
+  color: var(--color-orange) !important;
+  margin-left: 10px;
 }
 
 .cta-button-flat-beige:hover {
