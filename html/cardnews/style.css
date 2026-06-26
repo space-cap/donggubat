@@ -503,6 +503,7 @@ body.single-slide-mode .slide-card {
   font-weight: 800;
   line-height: 1.4;
   text-align: center;
+  word-break: keep-all;
 }
 
 /* ---------------------------------
