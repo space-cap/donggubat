@@ -74,13 +74,13 @@
       <div class="card-inner flex-row">
         <div class="text-area">
           <div class="benefit-badge">혜택 ③ SNS BONUS</div>
-          <h2 class="benefit-title">리뷰 올리고 공유하면<br>마일리지 한 번 더!</h2>
-          <div class="bonus-badge">+5% 추가 적립</div>
+          <h2 class="benefit-title">리뷰 올리고 공유하면<br>마일리지 추가 적립!</h2>
+          <div class="bonus-badge">5% 마일리지 적립</div>
           <p class="benefit-desc">Instagram, YouTube, Blog 어디든!<br>링크 등록 시 직전 구매 금액 기준 자동 적립</p>
         </div>
         <div class="image-area">
           <div class="image-frame shadow-effect">
-            <img src="images/슬라이드_3_추천.png" alt="동구밭 패키지 비누">
+            <img src="images/review_image.png" alt="동구밭 나노바나나 리뷰">
           </div>
         </div>
       </div>
@@ -191,11 +191,31 @@
         allowTaint: true,
         backgroundColor: null
       }).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+
+        // 브라우저 로컬 다운로드 트리거
         const link = document.createElement('a');
         link.download = `slide_${num}.png`;
-        link.href = canvas.toDataURL('image/png');
+        link.href = imgData;
         link.click();
-        return true;
+
+        // 백엔드 서버에 이미지 데이터 저장 요청
+        return fetch('/save-slide', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ num: num, imgData: imgData })
+        })
+        .then(response => response.json())
+        .then(data => {
+          console.log('Saved to server:', data);
+          return true;
+        })
+        .catch(err => {
+          console.error('Failed to save to server:', err);
+          return true;
+        });
       });
     }
 
