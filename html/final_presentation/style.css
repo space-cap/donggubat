@@ -80,16 +80,15 @@ body {
   backdrop-filter: blur(40px);
 }
 
-/* Layout Wrapper */
 .presentation-wrapper {
   position: relative;
   z-index: 2;
   width: 100%;
-  max-width: 1280px;
+  max-width: 1200px;
+  min-height: 100vh;
   padding: 40px;
-  display: grid;
-  grid-template-columns: 1fr 420px;
-  gap: 60px;
+  display: flex;
+  justify-content: center;
   align-items: center;
 }
 
